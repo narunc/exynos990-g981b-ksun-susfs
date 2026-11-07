@@ -70,7 +70,7 @@ python3 tools/s20/repack_boot.py boot.img out_g981b/arch/arm64/boot/Image vbmeta
 Flash `AP_G981B_KSUNext.tar` in Odin's **AP** slot (leave BL/CP/CSC empty). Data is kept.
 **Rollback:** tar your stock `boot.img` + `vbmeta.img` the same way and flash that in AP.
 
-**Option B: AnyKernel3 zip** (TWRP / OrangeFox, or the zip from Releases):
+**Option B: AnyKernel3 zip** (TWRP / OrangeFox):
 
 ```sh
 ./mkzip.sh -m g981b            # -> AnyKernel3_KSUNext_SUSFS_G981B_S20_5G_EXPERIMENTAL.zip
@@ -87,6 +87,8 @@ Then install the KernelSU-Next manager v3.4.2 from the
 * Kernel source: **GPL-2.0** (`COPYING`). KernelSU-Next kernel driver: **GPL-2.0** (`KernelSU-Next/kernel/LICENSE`).
   SuSFS (`fs/susfs.c`): **GPL-2.0**. AnyKernel3: its own license (`anykernel/LICENSE`).
 * Samsung firmware blobs and stock images are **not** included and are not covered by the GPL.
+  No prebuilt kernels are published either: a built `Image` embeds those blobs, so build it yourself
+  from your own stock firmware.
   `firmware/.gitignore` keeps them out of git; please don't force-add them.
 
 ## Credits
