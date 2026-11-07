@@ -41,7 +41,7 @@ cp "$IMG" "$W/Image"
   echo '## osm0sis @ xda-developers'
   echo ''
   echo 'properties() { '"'"''
-  echo "kernel.string=KernelSU-Next v3.1.0 + SuSFS v2.0.0 | $KSTR"
+  echo "kernel.string=KernelSU-Next v3.4.0-legacy+ + SuSFS v2.0.0 | $KSTR"
   echo 'do.devicecheck=1'; echo 'do.modules=0'; echo 'do.systemless=1'
   echo 'do.cleanup=1'; echo 'do.cleanuponabort=0'
   i=1; for cn in $CODENAMES; do echo "device.name${i}=${cn}"; i=$((i+1)); done
@@ -65,7 +65,7 @@ cp "$IMG" "$W/Image"
   echo 'ui_print "==================================================";'
   echo 'ui_print "   KernelSU-Next + SuSFS  (Exynos 990)";'
   echo "ui_print \"   $BDEV\";"
-  echo 'ui_print "   KernelSU-Next v3.1.0  +  SuSFS v2.0.0";'
+  echo 'ui_print "   KernelSU-Next v3.4.0-legacy+  +  SuSFS v2.0.0";'
   echo 'ui_print "   Detected model: ${AKMODEL:-(unreadable in recovery)}";'
   [ -n "$EXP" ] && echo 'ui_print "   *** EXPERIMENTAL - UNTESTED on this model ***";'
   echo 'ui_print "==================================================";'

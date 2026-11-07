@@ -47,12 +47,26 @@ HCF='-fcommon -Wno-error -Wno-deprecated-declarations -Wno-implicit-function-dec
 KCF='-Wno-unknown-warning-option -fno-builtin-stpcpy -fno-builtin-strlcpy -Wno-error -Wno-strict-prototypes -Wno-old-style-definition -Wno-implicit-function-declaration -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-unused-function -Wno-implicit-int -Wno-format'
 COMMON="ARCH=arm64 O=$OUT CC=clang CROSS_COMPILE=aarch64-linux-android- CLANG_TRIPLE=aarch64-linux-gnu-"
 
+# KernelSU-Next is vendored (not a git checkout), so its Kbuild cannot derive the version from
+# git. Pin what the vendored tree is (see KernelSU-Next/UPSTREAM.txt); the manager app uses it.
+KSU_PIN="KSU_VERSION_OVERRIDE=33316 KSU_VERSION_TAG_OVERRIDE=v3.4.0-legacy"
+
 cd "$ROOT"
+# Samsung firmware blobs are built into the kernel but are not distributed with this source.
+missing=""
+for fw in $(grep -vE '^#' tools/s20/firmware_manifest_G981BXXSNHYB1.tsv | cut -f1); do
+  [ -s "firmware/$fw" ] || missing="$missing $fw"
+done
+if [ -n "$missing" ]; then
+  echo "ERROR: missing firmware blobs:$missing"
+  echo "  Extract them from your stock boot.img:  python3 tools/s20/extract_firmware.py boot.img"
+  exit 1
+fi
 echo ">> building $MODEL  (base=$BASE + ksu.config)  clang=$("$CLANG_DIR/bin/clang" --version | head -1)"
 make $COMMON "KBUILD_HOSTCFLAGS=$HCF" "HOSTCFLAGS=$HCF" -j"$(nproc)" "$BASE"
 cat arch/arm64/configs/ksu.config >> "$OUT/.config"
 make $COMMON "KBUILD_HOSTCFLAGS=$HCF" "HOSTCFLAGS=$HCF" -j"$(nproc)" olddefconfig
-make $COMMON "KBUILD_HOSTCFLAGS=$HCF" "HOSTCFLAGS=$HCF" "KCFLAGS=$KCF" -j"$(nproc)" Image
+make $COMMON $KSU_PIN "KBUILD_HOSTCFLAGS=$HCF" "HOSTCFLAGS=$HCF" "KCFLAGS=$KCF" -j"$(nproc)" Image
 
 IMG="$OUT/arch/arm64/boot/Image"
 if [ -f "$IMG" ]; then
