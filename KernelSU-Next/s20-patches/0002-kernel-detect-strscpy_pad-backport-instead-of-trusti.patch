@@ -1,0 +1,47 @@
+From ce8715fc2c1e4fedae066889eb07d24051bfbc1d Mon Sep 17 00:00:00 2001
+From: s20-build <s20-build@localhost>
+Date: Sat, 7 Nov 2026 18:07:55 +0700
+Subject: [PATCH 2/2] kernel: detect strscpy_pad backport instead of trusting
+ LINUX_VERSION_CODE
+
+---
+ kernel/Kbuild                 | 4 ++++
+ kernel/compat/kernel_compat.h | 7 ++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/Kbuild b/kernel/Kbuild
+index d7f68806..be1ac010 100644
+--- a/kernel/Kbuild
++++ b/kernel/Kbuild
+@@ -284,6 +284,10 @@ ccflags-y += -DKSU_COMPAT_HAS_BACKPORTED_CPUS_PTR
+ endif
+ 
+ # Handle optional backports
++ifeq ($(shell grep -q "strscpy_pad" $(srctree)/include/linux/string.h; echo $$?),0)
++ccflags-y += -DKSU_COMPAT_HAS_STRSCPY_PAD
++endif
++
+ ifeq ($(shell grep -q "strncpy_from_user_nofault" $(srctree)/include/linux/uaccess.h; echo $$?),0)
+ ccflags-y += -DKSU_OPTIONAL_STRNCPY
+ endif
+diff --git a/kernel/compat/kernel_compat.h b/kernel/compat/kernel_compat.h
+index 090aab85..86a3de2b 100644
+--- a/kernel/compat/kernel_compat.h
++++ b/kernel/compat/kernel_compat.h
+@@ -88,7 +88,12 @@ static inline void ksu_kvfree(const void *buf)
+ // https://elixir.bootlin.com/linux/v4.14.222/source/lib/string.c#L282
+ static inline ssize_t __strscpy_pad(char *dest, const char *src, size_t count)
+ {
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 222)
++/*
++ * strscpy_pad() was backported to some stable branches (e.g. 4.14.222) but is
++ * missing from others with a higher version number (e.g. Samsung 4.19.87), so
++ * Kbuild detects it in include/linux/string.h instead of trusting the version.
++ */
++#if defined(KSU_COMPAT_HAS_STRSCPY_PAD)
+     return strscpy_pad(dest, src, count);
+ #elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0)
+     ssize_t res = strscpy(dest, src, count);
+-- 
+2.43.0
+

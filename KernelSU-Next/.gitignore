@@ -1,2 +1,5 @@
-manager
 userspace
+/manager
+# the S20 patches on top of upstream are part of this source (kernel .gitignore ignores *.patch)
+!/s20-patches/
+!/s20-patches/*.patch

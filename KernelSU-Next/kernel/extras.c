@@ -2,10 +2,12 @@
 #include <linux/atomic.h>
 #include <linux/version.h>
 
-#include "feature.h"
+#include "policy/feature.h"
+#include "uapi/feature.h"
 #include "klog.h"
-#include "ksud.h"
-#include "seccomp_cache.h"
+#include "ksu.h"
+#include "runtime/ksud.h"
+#include "infra/seccomp_cache.h"
 
 // sorry for the ifdef hell
 // but im too lazy to fragment this out.
@@ -64,14 +66,14 @@ static const struct ksu_feature_handler avc_spoof_handler = {
 static int get_sid()
 {
 	// dont load at all if we cant get sids
-	int err = security_secctx_to_secid("u:r:su:s0", strlen("u:r:su:s0"), &su_sid);
+	int err = ksu_security_secctx_to_secid("u:r:su:s0", strlen("u:r:su:s0"), &su_sid);
 	if (err) {
 		pr_info("avc_spoof/get_sid: su_sid not found!\n");
 		return -1;
 	}
 	pr_info("avc_spoof/get_sid: su_sid: %u\n", su_sid);
 
-	err = security_secctx_to_secid("u:r:priv_app:s0:c512,c768", strlen("u:r:priv_app:s0:c512,c768"), &priv_app_sid);
+	err = ksu_security_secctx_to_secid("u:r:priv_app:s0:c512,c768", strlen("u:r:priv_app:s0:c512,c768"), &priv_app_sid);
 	if (err) {
 		pr_info("avc_spoof/get_sid: priv_app_sid not found!\n");
 		return -1;
@@ -187,7 +189,7 @@ void ksu_avc_spoof_enable(void)
 	pr_info("avc_spoof/init: slow_avc_audit spoofing enabled!\n");
 }
 
-void ksu_avc_spoof_late_init()
+void ksu_avc_spoof_late_init(void)
 {
 	boot_completed = true;
 	
@@ -196,14 +198,14 @@ void ksu_avc_spoof_late_init()
 	}
 }
 
-void ksu_avc_spoof_init()
+void __init ksu_avc_spoof_init(void)
 {
 	if (ksu_register_feature_handler(&avc_spoof_handler)) {
 		pr_err("Failed to register avc spoof feature handler\n");
 	}
 }
 
-void ksu_avc_spoof_exit()
+void __exit ksu_avc_spoof_exit(void)
 {
 	if (ksu_avc_spoof_enabled) {
 		ksu_avc_spoof_disable();

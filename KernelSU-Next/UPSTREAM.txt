@@ -1,6 +1,13 @@
-KernelSU-Next upstream provenance
-=================================
-Source : https://github.com/KernelSU-Next/KernelSU-Next
-Tag    : v3.1.0-legacy-susfs
-Commit : ba4422f0556e10f40dda1887631d87a18ede4ec5
-Manager version code: 33024
+KernelSU-Next (vendored copy, kernel driver only is built)
+
+Upstream : https://github.com/KernelSU-Next/KernelSU-Next
+Branch   : legacy (non-GKI kernels)
+Base     : 465490a26667ba4cf00b3be975a7e28e53978829
+           "kernel: selinux: never sleep while holding the policy rwlock write side" (2026-10-15)
+           = v3.4.0-legacy + 21 commits, the last legacy commit before module preinit
+           (0b17f242), which raises the manager UAPI to 6. Released manager v3.4.2 speaks UAPI 5.
+Patches  : s20-patches/*.patch on top of Base (SuSFS v2.0.0 non-GKI glue, strscpy_pad detection)
+Version  : 33316 (git rev-list --count = 3027 + 30000 + 289), tag v3.4.0-legacy
+           Pinned in build.sh via KSU_VERSION_OVERRIDE because this copy is not a git repo.
+Manager  : KernelSU_Next_v3.4.2_33355-release.apk (official release; UAPI 5)
+License  : kernel/ is GPL-2.0 (kernel/LICENSE); the rest of the upstream repo is GPL-3.0 (LICENSE)
