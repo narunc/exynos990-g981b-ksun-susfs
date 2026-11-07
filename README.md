@@ -18,8 +18,32 @@ Based on [enchantedglycerin/exynos990-KernelSU-Next-SuSFS](https://github.com/en
 | Galaxy S20 5G (SM-G981B) | `g981b` | ✅ **Boots**: G981BXXSNHYB1, manager shows *Working*, Manual hooks, SuSFS v2.0.0, modules + Zygisk Next work |
 | S20+ (G985F), S20 (G980F), S20+ 5G (G986B), S20 Ultra (G988B) | `g985f` / `g980f` / `g986b` / `g988b` | ⚠️ Builds; not tested with this KernelSU-Next version |
 
-Use with the official **KernelSU-Next manager v3.4.2** (`KernelSU_Next_v3.4.2_33355-release.apk`), which speaks
-manager UAPI 5. Not for Snapdragon variants; Android 14+ is unsupported.
+Not for Snapdragon variants; Android 14+ is unsupported.
+
+## Manager app
+
+Use the **official KernelSU-Next manager v3.4.2**. This repo does not redistribute it; download it from the
+KernelSU-Next project:
+
+| | |
+|:--|:--|
+| Release | [KernelSU-Next v3.4.2](https://github.com/KernelSU-Next/KernelSU-Next/releases/tag/v3.4.2) |
+| File | [`KernelSU_Next_v3.4.2_33355-release.apk`](https://github.com/KernelSU-Next/KernelSU-Next/releases/download/v3.4.2/KernelSU_Next_v3.4.2_33355-release.apk) (16,682,167 bytes) |
+| SHA-256 | `774a5511f7034a4930e881114e202319cbdc34c5aaaa5c7c6b6d2902364e4c58` |
+
+```sh
+sha256sum KernelSU_Next_v3.4.2_33355-release.apk     # Windows: Get-FileHash <file>
+adb install -r KernelSU_Next_v3.4.2_33355-release.apk
+```
+
+The kernel only accepts a manager signed with the official KernelSU-Next key, so unofficial rebuilds
+are not recognised.
+
+> **Manager UAPI must match.** This kernel speaks manager UAPI **5**, the same as v3.4.2; the home screen
+> shows `33316-5` (kernel) and `33355-5` (manager). When the two numbers differ, the manager shows a
+> version-mismatch warning and turns off its root management features. Before switching to a newer
+> manager that speaks UAPI 6, rebuild the kernel from the newer KernelSU-Next `legacy` branch (past
+> `0b17f242`, *module preinit*) with the patches in `KernelSU-Next/s20-patches/`.
 
 ## What changed from upstream
 
@@ -79,8 +103,7 @@ Flash `AP_G981B_KSUNext.tar` in Odin's **AP** slot (leave BL/CP/CSC empty). Data
 The zip keeps your device's own dtb + ramdisk. It checks `ro.product.device` (`x1s`), which the
 4G G980F shares, so **check your exact model before flashing**.
 
-Then install the KernelSU-Next manager v3.4.2 from the
-[official releases](https://github.com/KernelSU-Next/KernelSU-Next/releases).
+Then install the KernelSU-Next manager v3.4.2 (see [Manager app](#manager-app) for the link and SHA-256).
 
 ## Licensing
 
